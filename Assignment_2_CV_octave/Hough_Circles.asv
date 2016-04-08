@@ -1,0 +1,47 @@
+I = imread('CTPhantom.jpg');
+if size(I, 3) > 1
+ I = rgb2gray(I);
+end
+rotI = imrotate(I,33,'crop');
+%imshow(rotI)
+% Find the edges in the image 
+BW = edge(I,'canny');
+imshow(BW);
+
+%Compute the Hough transform of the binary image returned by Canny.
+%[H,theta,rho] = hough(BW);
+
+[imgHeight,imgWidth]=size(BW);
+distMax=round(sqrt(imgHeight^2 + imgWidth)); %maximum possible rho value
+theta = -90:1:90 ;
+xo = 1:1:200;
+yo = 1:1:200;
+r = -distMax:1:distMax;
+
+H = zeros(length(xo),length(yo),length(r)); %accumalator array
+
+%start scannig
+for ix=1:200
+    for iy=1:200
+        if BW(iy,ix)~= 0
+            
+            for iXo = 1:length(xo);
+                for iYo = 1:length(yo);
+                    dist = sqrt((ix-iXo)^2+(iy-iYo)^2);
+                    [d,iR] = min(abs(r-dist));
+                end
+                
+                
+                if d<=1
+                    H(iXo,iYo,iR)= H(iXo,iYo,iR)+1;
+                end
+                
+            end
+          
+        end
+        
+    end
+end
+
+
+
